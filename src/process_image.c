@@ -6,7 +6,6 @@
 
 float get_pixel(image im, int x, int y, int c)
 {
-    // TODO Fill this in
     x = (x < 0) ? 0 : x;
     y = (y < 0) ? 0 : y;
     c = (c < 0) ? 0 : c;
@@ -30,7 +29,6 @@ void set_pixel(image im, int x, int y, int c, float v)
 image copy_image(image im)
 {
     image copy = make_image(im.w, im.h, im.c);
-    // TODO Fill this in
     int i, j, k;
     for ( i = 0; i < copy.w; i++ ) {
         for ( j = 0; j < copy.h; j++ ) {
@@ -48,7 +46,17 @@ image rgb_to_grayscale(image im)
 {
     assert(im.c == 3);
     image gray = make_image(im.w, im.h, 1);
-    // TODO Fill this in
+    int i, j;
+    for ( i = 0; i < gray.w; i++ ) {
+        for ( j = 0; j < gray.h; j++ ) {
+            float red = get_pixel(im, i, j, 0);
+            float green = get_pixel(im, i, j, 1);
+            float blue = get_pixel(im, i, j, 2);
+            float pixel = 0.299 * red + 0.587 * green + .114 * blue;
+            set_pixel(gray, i, j, 0, pixel);
+        }
+    }
+    free_image(im);
     return gray;
 }
 
