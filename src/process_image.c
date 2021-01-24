@@ -31,7 +31,16 @@ image copy_image(image im)
 {
     image copy = make_image(im.w, im.h, im.c);
     // TODO Fill this in
-    memcpy(copy.data, im.data, sizeof(float) * copy.h * copy.w * copy.c);
+    int i, j, k;
+    for ( i = 0; i < copy.w; i++ ) {
+        for ( j = 0; j < copy.h; j++ ) {
+            for ( k = 0; k < copy.c; k++ ) {
+                float pixel = get_pixel(im, i, j, k);
+                set_pixel(copy, i, j, k, pixel);
+            }
+        }
+    }
+    free_image(im);
     return copy;
 }
 
