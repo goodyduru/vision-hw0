@@ -101,24 +101,25 @@ float three_way_min(float a, float b, float c)
 void rgb_to_hsv(image im)
 {
     int i, j;
+    float red, green, blue, chroma, hue, saturation, value, quasi_hue, value_min, value_max;
     for ( i = 0; i < im.w; i++ ) {
         for (j = 0; j < im.h; j++ ) {
-            float red = get_pixel(im, i, j, 0);
-            float green = get_pixel(im, i, j, 1);
-            float blue = get_pixel(im, i, j, 2);
-            float value = three_way_max(red, green, blue);
-            float saturation = 0.0;
-            float chroma = 0.0;
+            red = get_pixel(im, i, j, 0);
+            green = get_pixel(im, i, j, 1);
+            blue = get_pixel(im, i, j, 2);
+            value = three_way_max(red, green, blue);
+            saturation = 0.0;
+            chroma = 0.0;
 
             //chroma is difference between maximum pixel and minimum pixel
             if ( value > 0 ) {
                 chroma = value - three_way_min(red, green, blue);
                 saturation = chroma / value;
             }
-            float value_max = value + 1e-5;
-            float value_min = value - 1e-5;
-            float quasi_hue = 0.0;
-            float hue = 0.0;
+            value_max = value + 1e-5;
+            value_min = value - 1e-5;
+            quasi_hue = 0.0;
+            hue = 0.0;
             if ( chroma > 0.0) {
                 if ( red > value_min && red < value_max ) {
                     quasi_hue = (green - blue) / chroma;
@@ -146,5 +147,56 @@ void rgb_to_hsv(image im)
 
 void hsv_to_rgb(image im)
 {
-    // TODO Fill this in
+    int i, j;
+    float chroma, hue, saturation, value, quasi_hue,
+            quasi_red, quasi_blue, quasi_green, x, range;
+    for ( i = 0; i < im.w; i++ ) {
+        for (j = 0; j < im.h; j++ ) {
+            hue = get_pixel(im, i, j, 0);
+            saturation = get_pixel(im, i, j, 1);
+            value = get_pixel(im, i, j, 2);
+            quasi_hue = hue * 6;
+            chroma = saturation * value;
+            x = chroma * ( 1 - fabs(fmod(quasi_hue, 2.0) - 1));
+            range = value - chroma;
+            if ( chroma <= 0.0 ) {
+                quasi_red = quasi_green = quasi_blue = 0;
+            }
+            else {
+                if ( quasi_hue <= 1 ) {
+                    quasi_red = chroma;
+                    quasi_green = x;
+                    quasi_blue = 0;
+                }
+                else if ( quasi_hue <= 2 ) {
+                    quasi_red = x;
+                    quasi_green = chroma;
+                    quasi_blue = 0;
+                }
+                else if ( quasi_hue <= 3 ) {
+                    quasi_red = 0;
+                    quasi_green = chroma;
+                    quasi_blue = x;
+                }
+                else if ( quasi_hue <= 4 ) {
+                    quasi_red = 0;
+                    quasi_green = x;
+                    quasi_blue = chroma;
+                }
+                else if ( quasi_hue <= 5 ) {
+                    quasi_red = x;
+                    quasi_green = 0;
+                    quasi_blue = chroma;
+                }
+                else {
+                    quasi_red = chroma;
+                    quasi_green = 0;
+                    quasi_blue = x;
+                }
+            }
+            set_pixel(im, i, j, 0, quasi_red+range);
+            set_pixel(im, i, j, 1, quasi_green+range);
+            set_pixel(im, i, j, 2, quasi_blue+range);
+        }
+    }
 }
