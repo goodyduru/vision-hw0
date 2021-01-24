@@ -100,7 +100,48 @@ float three_way_min(float a, float b, float c)
 
 void rgb_to_hsv(image im)
 {
-    // TODO Fill this in
+    int i, j;
+    for ( i = 0; i < im.w; i++ ) {
+        for (j = 0; j < im.h; j++ ) {
+            float red = get_pixel(im, i, j, 0);
+            float green = get_pixel(im, i, j, 1);
+            float blue = get_pixel(im, i, j, 2);
+            float value = three_way_max(red, green, blue);
+            float saturation = 0.0;
+            float chroma = 0.0;
+
+            //chroma is difference between maximum pixel and minimum pixel
+            if ( value > 0 ) {
+                chroma = value - three_way_min(red, green, blue);
+                saturation = chroma / value;
+            }
+            float value_max = value + 1e-5;
+            float value_min = value - 1e-5;
+            float quasi_hue = 0.0;
+            float hue = 0.0;
+            if ( chroma > 0.0) {
+                if ( red > value_min && red < value_max ) {
+                    quasi_hue = (green - blue) / chroma;
+                }
+                else if ( green > value_min && green < value_max ) {
+                    quasi_hue = (( blue - red ) / chroma ) + 2.0;
+                }
+                else {
+                    quasi_hue = ((red - green) / chroma) + 4.0;
+                }
+            }
+
+            if ( quasi_hue < 0 ) {
+                hue = (quasi_hue / 6) + 1;
+            }
+            else {
+                hue = quasi_hue / 6;
+            }
+            set_pixel(im, i, j, 0, hue);
+            set_pixel(im, i, j, 1, saturation);
+            set_pixel(im, i, j, 2, value);
+        }
+    }
 }
 
 void hsv_to_rgb(image im)
